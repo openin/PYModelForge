@@ -1,0 +1,33 @@
+[project]
+name = "py_model_forge"
+version = "0.0.1"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  'SQLAlchemy == 2.*',
+  'psycopg2 == 2.9.*'
+]
+
+[project.optional-dependencies]
+dev = [
+  "black==24.*",
+  "pytest>=7.2.0",
+  "pytest-cov>=4.0.0",
+  "ruff>=0.4.10",
+]
+
+[tool.ruff]
+line-length = 79
+exclude = [".env", ".venv", "venv", "notebooks"]
+
+[tool.black]
+line-length = 79
+extend-exclude = '''
+/(
+  | .env
+  | .venv
+)/
+'''
+
+[tool.pytest.ini_options]
+addopts= "--cov --cov-config=.coveragerc --cov-fail-under=85"
