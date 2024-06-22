@@ -1,5 +1,5 @@
 # PYModelForge
-Create models for SQLAlchemy from existing database
+Create models for SQLAlchemy 2.0.* from existing database
 
 ## How to
 modify db_url = "postgresql://username:password@localhost/dbname"
