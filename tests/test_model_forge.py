@@ -74,7 +74,9 @@ def test_camel_case():
     assert camel_case("API_key") == "ApiKey"
 
 
-def test_generate_model():
+def test_generate_model(setup_database):
+    connection = setup_database
+    inspector = inspect(connection)
     columns = [
         {
             "name": "id",
@@ -90,7 +92,7 @@ def test_generate_model():
         },
     ]
     relationships = ["posts = relationship('Post', back_populates='user')"]
-    model = generate_model("users", columns, relationships)
+    model = generate_model("users", columns, relationships, inspector)
     assert "class Users(Base):" in model
     assert "__tablename__ = 'users'" in model
     assert "id = Column(Integer, nullable=False, primary_key=True)" in model

@@ -31,29 +31,33 @@ def camel_case(s):
     return "".join([s[0].upper(), s[1:]])
 
 
-def generate_model(table_name, cols, relations):
+def generate_model(table_name, cols, relations, inspector):
     class_name = camel_case(table_name)
     model_code = f"class {class_name}(Base):\n"
     model_code += f"    __tablename__ = '{table_name}'\n\n"
-
     for col in cols:
         col_name = col["name"]
         col_type = get_column_type(col)
         nullable = "" if col["nullable"] else ", nullable=False"
-        pk = ", primary_key=True" if col["primary_key"] else ""
-        fk = (
-            f", ForeignKey('{col['foreign_key']}')"
-            if col.get("foreign_key")
+        pk = (
+            ", primary_key=True"
+            if col["name"]
+            in inspector.get_pk_constraint(table_name)["constrained_columns"]
             else ""
         )
         model_code += (
-            f"    {col_name} = Column({col_type.__name__}{nullable}{pk}{fk})\n"
+            f"    {col_name} = Column({col_type.__name__}{nullable}{pk})\n"
         )
-
+    for fk in inspector.get_foreign_keys(table_name):
+        model_code += (
+            f"    ForeignKeyConstraint({fk["constrained_columns"]},"
+            f"{[f"{fk['referred_table']}.{referred_columns}" 
+                for referred_columns in fk['referred_columns']]}"
+            f',{"".join(f'{key}="{value}"' for key, value in fk["options"].items())})\n'
+        )
     model_code += "\n"
     for rel in relations:
         model_code += f"    {rel}\n"
-
     return model_code
 
 
@@ -164,7 +168,7 @@ def generate_models_content(inspector):
             relationships = generate_relationships(table, inspector)
             if table in m2m_relationships:
                 relationships.extend(m2m_relationships[table])
-            write(generate_model(table, columns, relationships))
+            write(generate_model(table, columns, relationships, inspector))
             write("\n")
     return output.getvalue()
 
