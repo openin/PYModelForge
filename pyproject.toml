@@ -10,10 +10,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "black==25.*",
-  "pytest>=7.2.0",
-  "pytest-cov>=4.0.0",
-  "ruff>=0.4.10",
+  "black==26.*",
+  "pytest>=9.0.3",
+  "pytest-cov>=7.1.0",
+  "ruff>=0.15.10",
 ]
 
 [tool.ruff]
